@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>URL Shortener</title>
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h2>URL Shortener</h2>
+      <form id="shortenerForm">
+        <div>
+          <label for="url">Enter URL:</label>
+          <input
+            type="text"
+            id="url"
+            name="url"
+            placeholder="https://example.com"
+            required
+          />
+        </div>
+
+        <div>
+          <label for="shortCode">Enter shortCode:</label>
+          <input
+            type="text"
+            id="shortCode"
+            name="shortCode"
+            placeholder="my-custom-link"
+          />
+        </div>
+
+        <button type="submit">Shorten</button>
+      </form>
+
+      <div class="result" id="result">
+        <h3>Shortened URLs</h3>
+        <ul id="shortended-urls"></ul>
+        <!-- Example output (backend will replace this dynamically) -->
+        <!-- <div class="short-link">
+        <a href="http://localhost:3000/abc123">http://localhost:3000/abc123</a> -> https://example.com
+      </div> -->
+      </div>
+    </div>
+
+    <!-- Logic Code Script -->
+     <script>
+        document.getElementById("shortenerForm")
+        .addEventListener("submit", (event) => {
+            event.preventDefault()
+
+            const formData = new FormData(event.target)
+            const url = formData.get("url")
+            const shortCode = formData.get("shortCode")
+            console.log(url, shortCode)
+        })
+     </script>
+  </body>
+</html>
