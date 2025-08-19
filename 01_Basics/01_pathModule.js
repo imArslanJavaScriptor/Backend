@@ -1,14 +1,15 @@
-const path = require("path")
+const path = require("path");
 
-console.log("File Name", __filename)
-console.log("Directory Name", __dirname)
-const filePath = path.join("folder", "students", "data.txt") 
-console.log(filePath)
+console.log("File Name: ", __filename);
+console.log("Directory Name: ", __dirname);
 
-const parseData = path.parse(filePath)
-const resolvePath = path.resolve(filePath)
-const extname = path.extname(filePath)
-const basename = path.basename(filePath)
-const dirname = path.dirname(filePath)
+const FilePath = path.join("public", "images", "loader.png");
+// console.log(FilePath);
 
-console.log({parseData, resolvePath, extname, basename, dirname, separator: path.sep})
+const ParseData = path.parse(FilePath);
+const ResolvePath = path.resolve(FilePath);
+const ExtentionName = path.extname(FilePath);
+const BaseName = path.basename(FilePath);
+const DirectoryName = path.dirname(FilePath);
+
+console.log("====", DirectoryName);
