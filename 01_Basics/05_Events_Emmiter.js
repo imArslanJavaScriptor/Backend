@@ -1,40 +1,48 @@
 // Require / Import EventEmitter Class
 const EventEmitter = require("events");
 
+const emmiter = new EventEmitter();
+emmiter.on("customFunction", (age) => {
+  let userNames = ["Alex", "Brad", "Challse", "Diana", "Norma", "Hellen"];
+  userNames.map((user, index) =>
+    console.log(`Hi, My Name is ${user} and i'm ${age[index]} now.`)
+  );
+});
+
+let usersAge = ["20", "22", "24", "19", "18", "26"];
+emmiter.emit("customFunction", usersAge);
+
 // Create an Instance of EventEmitter
-const emiiter = new EventEmitter();
+// const emiiter = new EventEmitter();
 
 // 1. Define an event listener (on) and emit it
 emiiter.on("custom", () => {
-    let arr = ['Apple', 'Mango', 'Banana', 'Orange'];
-    arr.map((item) => console.log(item));
+  let arr = ["Apple", "Mango", "Banana", "Orange"];
+  arr.map((item) => console.log(item));
 });
 
 // Emit "custom" event → logs all fruits
 // emiiter.emit("custom");
 
-
 // 2. Event listener with a single argument
 emiiter.addListener("greet", (userName) => {
-    console.log(`Hello My Name is ${userName}`);
+  console.log(`Hello My Name is ${userName}`);
 });
 
 // Emit "greet" event → passes one argument
 // emiiter.emit("greet", "Arslan");
 
-
 // 3. Event listener with multiple arguments
 emiiter.addListener("users", (...args) => {
-    console.log(...args);
+  console.log(...args);
 });
 
 // Emit "users" event → logs multiple fruits
 // emiiter.emit("users", "Apple", "Mango", "Banana", "Orange");
 
-
 // 4. Event listener with an object argument
 emiiter.addListener("greet2", (arg) => {
-    console.log(`Hello ${arg.name}, You're a ${arg.prof}`);
+  console.log(`Hello ${arg.name}, You're a ${arg.prof}`);
 });
 
 // Emit "greet2" event → passes object with properties
@@ -54,19 +62,19 @@ function registerEvent(eventName) {
 
   // Listen for the event and increment count each time triggered
   eventEmitter.on(eventName, (data) => {
-    eventCounts[eventName]++; 
+    eventCounts[eventName]++;
     console.log(`Event: ${eventName}, Data:`, data);
   });
 }
 
 // Register four custom events
-registerEvent('user-login');
-registerEvent('user-logout');
-registerEvent('user-purchase');
-registerEvent('profile-update');
+registerEvent("user-login");
+registerEvent("user-logout");
+registerEvent("user-purchase");
+registerEvent("profile-update");
 
 // Special event to log summary of all event counts
-eventEmitter.on('summary', () => {
+eventEmitter.on("summary", () => {
   console.log("\n===== Event Summary =====");
   for (const [event, count] of Object.entries(eventCounts)) {
     console.log(`${event} was triggered ${count} times`);
@@ -74,13 +82,12 @@ eventEmitter.on('summary', () => {
 });
 
 // Emit events multiple times with different data
-eventEmitter.emit('user-login', { username: 'Alice' });
-eventEmitter.emit('user-logout', { username: 'Alice' });
-eventEmitter.emit('user-login', { username: 'Bob' });
-eventEmitter.emit('user-purchase', { username: 'Alice', item: 'Laptop' });
-eventEmitter.emit('profile-update', { username: 'Bob', field: 'email' });
-eventEmitter.emit('user-purchase', { username: 'Bob', item: 'Phone' });
+eventEmitter.emit("user-login", { username: "Alice" });
+eventEmitter.emit("user-logout", { username: "Alice" });
+eventEmitter.emit("user-login", { username: "Bob" });
+eventEmitter.emit("user-purchase", { username: "Alice", item: "Laptop" });
+eventEmitter.emit("profile-update", { username: "Bob", field: "email" });
+eventEmitter.emit("user-purchase", { username: "Bob", item: "Phone" });
 
 // Trigger summary event at the end
-eventEmitter.emit('summary');
-
+eventEmitter.emit("summary");
