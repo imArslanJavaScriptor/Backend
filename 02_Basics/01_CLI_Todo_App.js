@@ -1,5 +1,4 @@
 import readline from "readline";
-
 const readLineInterface = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
