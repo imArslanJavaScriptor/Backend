@@ -2,193 +2,42 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- Set character encoding -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Mobile responsive -->
-    <title>URL Shortener</title>
-    <!-- Page title -->
+    <title>Document</title>
     <link rel="stylesheet" href="./styles.css" />
-    <!-- Link stylesheet -->
-    <style>
-      /* Simple toast styles */
-      #toast {
-        visibility: hidden; /* Hidden by default */
-        min-width: 250px; /* Min width */
-        margin-left: -125px; /* Center align */
-        background-color: #333; /* Dark background */
-        color: #fff; /* White text */
-        text-align: center; /* Center text */
-        border-radius: 5px; /* Rounded corners */
-        padding: 12px; /* Padding */
-        position: fixed; /* Fixed position */
-        z-index: 1; /* Stay on top */
-        left: 50%; /* Center horizontally */
-        bottom: 30px; /* 30px from bottom */
-        font-size: 14px;
-      }
-      #toast.show {
-        visibility: visible; /* Show when active */
-        animation: fadein 0.5s, fadeout 0.5s 2.5s; /* Fade in/out */
-      }
-      @keyframes fadein {
-        from {
-          bottom: 0;
-          opacity: 0;
-        } /* Start hidden */
-        to {
-          bottom: 30px;
-          opacity: 1;
-        } /* End visible */
-      }
-      @keyframes fadeout {
-        from {
-          bottom: 30px;
-          opacity: 1;
-        } /* Start visible */
-        to {
-          bottom: 0;
-          opacity: 0;
-        } /* End hidden */
-      }
-    </style>
   </head>
   <body>
     <div class="container">
-      <h2>URL Shortener</h2>
-      <!-- Title -->
-      <form id="shortenerForm">
-        <!-- Form for shortening -->
-        <div>
-          <label for="url">Enter URL:</label>
-          <!-- Label -->
-          <input
-            type="text"
-            id="url"
-            name="url"
-            placeholder="https://example.com"
-            required
-          />
-          <!-- URL input -->
+      <h1>URL Shortner</h1>
+      <form id="shorten-from">
+        <div class="inp-field-div">
+          <label for="url">Enter URL</label>
+          <input type="url" name="url" id="url" required />
         </div>
-        <div>
-          <label for="shortCode">Enter shortCode (optional):</label>
-          <!-- Label -->
-          <input
-            type="text"
-            id="shortCode"
-            name="shortCode"
-            placeholder="my-custom-link"
-          />
-          <!-- Custom code input -->
+        <div class="inp-field-div">
+          <label for="shortCode">Enter Short Code</label>
+          <input type="text" name="shortCode" id="shortCode" required />
         </div>
-        <button type="submit">Shorten</button>
-        <!-- Submit button -->
+        <div class="flex">
+          <button type="submit">Shorten</button>
+        </div>
       </form>
 
-      <div class="result" id="result" style="margin-top: 20px">
-        <!-- Results section -->
-        <h3>Shortened URLs</h3>
-        <ul id="shortened-urls"></ul>
-        <!-- List of URLs -->
-      </div>
+      <h2>Shortened URL's</h2>
+      <ul id="shortened-urls">
+        <li>List</li>
+      </ul>
     </div>
 
-    <!-- Toast container -->
-    <div id="toast"></div>
-
     <script>
-      const form = document.getElementById("shortenerForm"); // Get form
-      const resultList = document.getElementById("shortened-urls"); // Get results list
-      const toast = document.getElementById("toast"); // Get toast element
-
-      // Function to show toast message
-      function showToast(message) {
-        toast.textContent = message; // Set text
-        toast.className = "show"; // Add visible class
-        setTimeout(
-          () => (toast.className = toast.className.replace("show", "")),
-          3000
-        ); // Hide after 3s
-      }
-
-      // Load from localStorage
-      function loadFromLocalStorage() {
-        const stored = JSON.parse(
-          localStorage.getItem("shortenedLinks") || "{}"
-        ); // Parse or default {}
-        for (const [shortCode, url] of Object.entries(stored)) {
-          // Loop stored links
-          addLinkToUI(shortCode, url); // Add to UI
-        }
-      }
-
-      // Save to localStorage
-      function saveToLocalStorage(shortCode, url) {
-        const stored = JSON.parse(
-          localStorage.getItem("shortenedLinks") || "{}"
-        ); // Get existing
-        stored[shortCode] = url; // Add new
-        localStorage.setItem("shortenedLinks", JSON.stringify(stored)); // Save back
-      }
-
-      // Add link to UI
-      function addLinkToUI(shortCode, url) {
-        const li = document.createElement("li"); // Create list item
-        const shortUrl = `${window.location.origin}/${shortCode}`; // Construct short URL
-        li.innerHTML = `<a href="${shortUrl}" target="_blank">${shortUrl}</a> → ${url}`; // Set content
-        resultList.appendChild(li); // Append to list
-      }
-
-      // Fetch links from backend
-      async function fetchShortenedUrls() {
-        try {
-          const response = await fetch("/links"); // GET links
-          if (!response.ok) throw new Error("Failed to fetch links"); // Error if not ok
-          const links = await response.json(); // Parse JSON
-          resultList.innerHTML = ""; // Clear UI
-          localStorage.setItem("shortenedLinks", JSON.stringify(links)); // Sync storage
-          for (const [shortCode, url] of Object.entries(links)) {
-            // Loop links
-            addLinkToUI(shortCode, url); // Add each to UI
-          }
-        } catch (error) {
-          console.error(error); // Log error
-          showToast("Error fetching links"); // Show toast
-        }
-      }
-
-      // Handle form submit
-      form.addEventListener("submit", async (event) => {
-        event.preventDefault(); // Stop reload
-        const formData = new FormData(form); // Get form data
-        const url = formData.get("url").trim(); // Get URL
-        const shortCode = formData.get("shortCode").trim(); // Get custom code
-        if (!url) return showToast("Please enter a valid URL"); // Validation
-
-        try {
-          const response = await fetch("/shorten", {
-            // Send POST
-            method: "POST",
-            headers: { "Content-Type": "application/json" }, // JSON header
-            body: JSON.stringify({ url, shortCode }), // Body
-          });
-
-          const data = await response.json(); // Parse response
-          if (!response.ok) throw new Error(data || "Something went wrong"); // Handle errors
-
-          addLinkToUI(data.shortCode, url); // Add to UI
-          saveToLocalStorage(data.shortCode, url); // Save locally
-          showToast("URL shortened successfully"); // Notify
-          form.reset(); // Reset form
-        } catch (error) {
-          console.error(error); // Log
-          showToast(error.message); // Notify error
-        }
-      });
-
-      // On page load: load local first, then sync backend
-      loadFromLocalStorage(); // Load localStorage first
-      fetchShortenedUrls(); // Then fetch backend
+      document
+        .getElementById("shorten-from")
+        .addEventListener("submit", (event) => {
+          event.preventDefault();
+          const formData = new FormData(event.target);
+          const url = formData.get("url");
+          const shortCode = formData.get("shortCode");
+        });
     </script>
   </body>
 </html>
