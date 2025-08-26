@@ -10,6 +10,7 @@ const directoryName = path.dirname(fileName);
 const PORT = 3000;
 const DATA_FILE = path.join(directoryName, "data", "links.json");
 
+// Serve static files like HTML/CSS
 const serveFile = async (res, filePath, contentType) => {
   try {
     const data = await readFile(filePath);
@@ -21,11 +22,13 @@ const serveFile = async (res, filePath, contentType) => {
   }
 };
 
+// Load saved links from JSON file
 const loadLinks = async () => {
   try {
     const data = await readFile(DATA_FILE, "utf-8");
     return JSON.parse(data);
   } catch (error) {
+    // If file doesn't exist, create one
     if (error.code === "ENOENT") {
       await writeFile(DATA_FILE, JSON.stringify({}));
       return {};
@@ -34,10 +37,12 @@ const loadLinks = async () => {
   }
 };
 
+// Save links to JSON file
 const saveLinks = async (links) => {
   await writeFile(DATA_FILE, JSON.stringify(links, null, 2), "utf-8");
 };
 
+// Main server
 const server = createServer(async (req, res) => {
   if (req.method === "GET") {
     if (req.url === "/") {
@@ -52,15 +57,20 @@ const server = createServer(async (req, res) => {
         path.join(directoryName, "public", "styles.css"),
         "text/css"
       );
-    } else {
-      // Check if it's a short code redirect
+    } else if (req.url === "/links") {
       const links = await loadLinks();
-      const code = req.url.slice(1); // remove leading "/"
-      if (links[code]) {
-        res.writeHead(302, { Location: links[code] });
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify(links));
+    } else {
+      // Redirect if short code exists
+      const links = await loadLinks();
+      const shortCode = req.url.slice(1); // remove "/"
+      if (links[shortCode]) {
+        res.writeHead(302, { location: links[shortCode] });
         return res.end();
       }
 
+      // Fallback if short code not found
       res.writeHead(404, { "Content-Type": "text/html" });
       return res.end("404 Page not found.");
     }
@@ -79,13 +89,16 @@ const server = createServer(async (req, res) => {
         return res.end("URL is required");
       }
 
+      // Generate random short code if user didn’t provide
       const finalShortCode = shortCode || crypto.randomBytes(4).toString("hex");
 
+      // Check if short code already exists
       if (links[finalShortCode]) {
         res.writeHead(400, { "Content-Type": "text/plain" });
         return res.end("Short Code already exists. Please choose another.");
       }
 
+      // Save new shortened URL
       links[finalShortCode] = url;
       await saveLinks(links);
 
@@ -95,6 +108,7 @@ const server = createServer(async (req, res) => {
   }
 });
 
+// Start server
 server.listen(PORT, () => {
   console.log(`Server is Running at http://localhost:${PORT}`);
 });
