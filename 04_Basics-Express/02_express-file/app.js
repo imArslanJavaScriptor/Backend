@@ -9,13 +9,15 @@ const app = express();
 const data = await fetch("https://jsonplaceholder.typicode.com/posts");
 const jsonData = await data.json();
 
-// To use import.meta.dirname and import.meta.filename, pur node version should be 20.11.0 or above.
+// To use import.meta.dirname and import.meta.filename, YOUR node version should be 20.11.0 or above.
 
 // Middleware to serve static files
 const staticPath = Path.join(import.meta.dirname, "public");
 app.use(express.static(staticPath));
 
+
 app.get("/", (req, res) => {
+  // These __dirname & __filename will not work in ES_Modules
   // console.log(__dirname);
   // console.log(__filename);
 

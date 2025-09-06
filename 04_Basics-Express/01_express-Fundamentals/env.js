@@ -1,6 +1,7 @@
-// // export const PORT = isNaN(process.env.PORT)
-// //   ? 3000
-// //   : parseInt(process.env.PORT, 10);
+// export const PORT = isNaN(process.env.PORT)
+//   ? 3000
+//   : parseInt(process.env.PORT, 10);
+
 
 import { z, ZodError } from "zod";
 
@@ -8,21 +9,25 @@ import { z, ZodError } from "zod";
 
 // const userAge = 20;
 
-// // const parseUserAge = ageSchema.parse(userAge);
+// const parseUserAge = ageSchema.parse(userAge);
+
+// console.log(parseUserAge)
 
 // const { data, error, success } = ageSchema.safeParse(userAge);
 // console.log(success);
 
-// // try {
-// //   const parseUserAge = ageSchema.parse(userAge);
-// //   console.log(parseUserAge);
-// // } catch (error) {
-// //   if (error instanceof ZodError) {
-// //     console.log(error.issues[0].message);
-// //   } else {
-// //     console.log("Unexpected error:", error);
-// //   }
-// // }
+// try {
+//   const parseUserAge = ageSchema.parse(userAge);
+//   console.log(parseUserAge);
+// } catch (error) {
+//   if (error instanceof ZodError) {
+//     console.log(error.issues[0].message);
+//   } else {
+//     console.log("Unexpected error:", error);
+//   }
+// }
 
 const portSchema = z.coerce.number().min(1).max(65535).default(3000);
 export const PORT = portSchema.parse(process.env.PORT);
+
+
