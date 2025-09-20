@@ -4,8 +4,14 @@ import path from "path";
 import { fileURLToPath } from "url";
 import crypto from "crypto";
 
+import express from "express";
+
+const app = express();
+
 const fileName = fileURLToPath(import.meta.url);
 const directoryName = path.dirname(fileName);
+
+app.use(express.static("public"));
 
 const PORT = 3000;
 const DATA_FILE = path.join(directoryName, "data", "links.json");
@@ -42,6 +48,35 @@ const saveLinks = async (links) => {
   await writeFile(DATA_FILE, JSON.stringify(links, null, 2), "utf-8");
 };
 
+app.get("/", async (req, res) => {
+  try {
+    const file = await readFile(path.join("views", "index.html"));
+    const links = await loadLinks();
+  } catch (error) {
+    return res.status(500).send("Internal Server Error");
+  }
+});
+
+app.post("/", async (req, res) => {
+  try {
+    const { url, shortCode } = req.body;
+    // Generate random short code if user didn’t provide
+    const finalShortCode = shortCode || crypto.randomBytes(4).toString("hex");
+    const links = await loadLinks();
+
+    // Check if short code already exists
+    if (links[finalShortCode]) {
+      return res
+        .status(400)
+        .res.end("Short Code already exists. Please choose another.");
+    }
+
+    // Save new shortened URL
+    links[finalShortCode] = url;
+    await saveLinks(links);
+  } catch (error) {}
+});
+
 // Main server
 const server = createServer(async (req, res) => {
   if (req.method === "GET") {
@@ -74,37 +109,6 @@ const server = createServer(async (req, res) => {
       res.writeHead(404, { "Content-Type": "text/html" });
       return res.end("404 Page not found.");
     }
-  }
-
-  if (req.method === "POST" && req.url === "/shorten") {
-    const links = await loadLinks();
-
-    let body = "";
-    req.on("data", (chunk) => (body += chunk));
-    req.on("end", async () => {
-      const { url, shortCode } = JSON.parse(body);
-
-      if (!url) {
-        res.writeHead(400, { "Content-Type": "text/plain" });
-        return res.end("URL is required");
-      }
-
-      // Generate random short code if user didn’t provide
-      const finalShortCode = shortCode || crypto.randomBytes(4).toString("hex");
-
-      // Check if short code already exists
-      if (links[finalShortCode]) {
-        res.writeHead(400, { "Content-Type": "text/plain" });
-        return res.end("Short Code already exists. Please choose another.");
-      }
-
-      // Save new shortened URL
-      links[finalShortCode] = url;
-      await saveLinks(links);
-
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ success: true, shortCode: finalShortCode }));
-    });
   }
 });
 
